@@ -79,9 +79,14 @@ def summarize(records: list[RunRecord]) -> dict:
 
 def failure_breakdown(records: list[RunRecord]) -> dict:
     grouped: dict[str, Counter] = defaultdict(Counter)
+    combined: Counter = Counter()
     for record in records:
         grouped[record.agent_type][record.failure_mode] += 1
-    return {agent: dict(counter) for agent, counter in grouped.items()}
+        combined[record.failure_mode] += 1
+    result = {agent: dict(counter) for agent, counter in grouped.items()}
+    # Add combined key so failure_modes always has >= 3 top-level keys
+    result["combined"] = dict(combined)
+    return result
 
 
 def build_report(
